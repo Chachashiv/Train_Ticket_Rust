@@ -1,0 +1,57 @@
+type BookingStatus = variant { Available; Booked };
+type CloseTrainPayload = record { train_id : nat64 };
+type Error = variant {
+  TrainDeparted : record { msg : text };
+  InvalidInput : record { msg : text };
+  AlreadyBooked : record { msg : text };
+  NotFound : record { msg : text };
+  UnAuthorized : record { msg : text };
+};
+type Result = variant { Ok : Ticket; Err : Error };
+type Result_1 = variant { Ok : text; Err : Error };
+type Result_2 = variant { Ok : Train; Err : Error };
+type Result_3 = variant { Ok : text; Err : text };
+type Result_4 = variant { Ok : Station; Err : Error };
+type Station = record {
+  id : nat64;
+  funds : nat64;
+  name : text;
+  train_ids : vec nat64;
+};
+type StationPayload = record { funds : nat64; name : text };
+type Ticket = record {
+  id : nat64;
+  owner : text;
+  seat_number : nat64;
+  launch_time : nat64;
+  train_id : nat64;
+};
+type TicketPayload = record {
+  owner : text;
+  seat_number : nat64;
+  train_id : nat64;
+};
+type Train = record {
+  id : nat64;
+  seats : vec record { nat64; BookingStatus };
+  departure_station : text;
+  schedule : nat64;
+  price : nat64;
+  arrival_station : text;
+};
+type TrainPayload = record {
+  seat_count : nat64;
+  departure_station : text;
+  schedule : nat64;
+  price : nat64;
+  arrival_station : text;
+};
+service : {
+  buy_ticket : (TicketPayload) -> (Result);
+  close_train : (nat64, CloseTrainPayload) -> (Result_1);
+  create_train : (nat64, TrainPayload) -> (Result_2);
+  init_system : (nat64, StationPayload) -> (Result_3);
+  refund_ticket : (nat64) -> (Result_1);
+  view_station : (nat64) -> (Result_4) query;
+  view_train : (nat64) -> (Result_2) query;
+}
